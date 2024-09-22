@@ -1,0 +1,77 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+
+const app = express();
+app.use(bodyParser.json());
+
+// Mock database for cricket players
+let players = [
+    { id: 1, name: 'Virat Kohli', age: 34, team: 'India', role: 'Batsman' },
+    { id: 2, name: 'Rohit Sharma', age: 36, team: 'India', role: 'Batsman' },
+    { id: 3, name: 'Jasprit Bumrah', age: 29, team: 'India', role: 'Bowler' },
+    { id: 4, name: 'MS Dhoni', age: 42, team: 'India', role: 'Wicketkeeper' },
+    { id: 5, name: 'Kane Williamson', age: 34, team: 'New Zealand', role: 'Batsman' },
+    { id: 6, name: 'Steve Smith', age: 34, team: 'Australia', role: 'Batsman' },
+    { id: 7, name: 'Pat Cummins', age: 30, team: 'Australia', role: 'Bowler' },
+    { id: 8, name: 'Ben Stokes', age: 32, team: 'England', role: 'All-rounder' },
+    { id: 9, name: 'Joe Root', age: 33, team: 'England', role: 'Batsman' },
+    { id: 10, name: 'Babar Azam', age: 29, team: 'Pakistan', role: 'Batsman' },
+    { id: 11, name: 'Shaheen Afridi', age: 23, team: 'Pakistan', role: 'Bowler' },
+    { id: 12, name: 'David Warner', age: 37, team: 'Australia', role: 'Batsman' },
+    { id: 13, name: 'Rassie van der Dussen', age: 34, team: 'South Africa', role: 'Batsman' },
+    { id: 14, name: 'Quinton de Kock', age: 30, team: 'South Africa', role: 'Wicketkeeper' },
+    { id: 15, name: 'Shane Watson', age: 43, team: 'Australia', role: 'All-rounder' },
+];
+
+// GET all players
+app.get('/players', (req, res) => {
+    res.json(players);
+});
+
+// GET a player by ID
+app.get('/players/:id', (req, res) => {
+    const player = players.find(p => p.id == req.params.id);
+    if (!player) return res.status(404).send('Player not found');
+    res.json(player);
+});
+
+// POST a new player
+app.post('/players', (req, res) => {
+    const newPlayer = {
+        id: players.length + 1,
+        name: req.body.name,
+        age: req.body.age,
+        team: req.body.team,
+        role: req.body.role
+    };
+    players.push(newPlayer);
+    res.status(201).json(newPlayer);
+});
+
+// PATCH (update) a player by ID
+app.patch('/players/:id', (req, res) => {
+    const player = players.find(p => p.id == req.params.id);
+    if (!player) return res.status(404).send('Player not found');
+
+    if (req.body.name) player.name = req.body.name;
+    if (req.body.age) player.age = req.body.age;
+    if (req.body.team) player.team = req.body.team;
+    if (req.body.role) player.role = req.body.role;
+
+    res.json(player);
+});
+
+// DELETE a player by ID
+app.delete('/players/:id', (req, res) => {
+    const playerIndex = players.findIndex(p => p.id == req.params.id);
+    if (playerIndex === -1) return res.status(404).send('Player not found');
+
+    players.splice(playerIndex, 1);
+    res.status(204).send();
+});
+
+// Start the server
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
